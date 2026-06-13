@@ -9,8 +9,9 @@ Source: https://davidmegginson.github.io/ourairports-data/runways.csv
         (OurAirports data is public domain.)
 
 Output shape (minified):
-  {"KSFO": [["10L",118],["28R",298], ...], ...}
-  -> per airport, a list of [runway_end_ident, true_heading_degrees].
+  {"KSFO": [{"id":"10L","hdg":118},{"id":"28R","hdg":298}, ...], ...}
+  -> per airport, a list of runway ends with ident + true heading. Object
+     form (not positional arrays) so Infinity parses named id/hdg fields.
 
 Refresh roughly yearly (runway numbers drift with magnetic declination):
   python3 build.py && git commit -am "refresh runway data" && git push
@@ -53,7 +54,7 @@ def build(path):
                     continue
                 rid = r[id_col].strip()
                 if rid:
-                    ends.append([rid, hdg])
+                    ends.append({"id": rid, "hdg": hdg})
             if ends:
                 out.setdefault(ident, []).extend(ends)
     return out
